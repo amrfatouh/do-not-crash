@@ -38,6 +38,8 @@ body {
     position: absolute;
     top: 400px;
     right: 300px;
+    text-align: center;
+    color: #444;
 }
 
 .result {

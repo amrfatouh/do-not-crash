@@ -27,6 +27,16 @@ function moveCar(carArray) {
     }
 }
 
+/* letting the user use the space button */
+document.body.onkeydown = handleKeyDown;
+
+function handleKeyDown() {
+    moveBtn.blur();
+    if(event.code == 'Space') {
+        moveCar(carArray);
+    }
+}
+
 function isCrashUponMove(car) {
     var carPosition = parseFloat(car.style.top);
     if (carPosition >= 350 && carPosition < 450) {
@@ -135,7 +145,10 @@ function crashed() {
     for(var i = 0; i < carArray.length; i++) {
         carArray[i].classList.add('transparent');
     }
+    /* disabling inputs */
     moveBtn.disabled = true;
+    document.body.onkeydown = reset;
+    /* clearing all intervals */
     for (var i = 0; i < intervalArray.length; i++) {
         clearInterval(intervalArray[i]);
     }
@@ -164,5 +177,7 @@ function reset () {
     for (var i = 0; i< transparentArray.length; i++) {
         transparentArray[i].classList.remove('transparent');
     }
+    /* re-enabling the inputs */
     moveBtn.disabled = false;
+    document.body.onkeydown = handleKeyDown;
 }
