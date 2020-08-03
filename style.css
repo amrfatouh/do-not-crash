@@ -1,0 +1,41 @@
+body {
+    position: relative;
+    margin: 0;
+}
+
+.car {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+}
+.my-car {
+    background-color: #555;
+    top: 400px;
+    left: 600px;
+}
+.opposite-car {
+    background-color: #A33;
+}
+.car-left {
+    left: 600px;
+}
+.car-right {
+    left: 750px;
+}
+
+.middle-line {
+    background-color: #000;
+    width: 1px;
+    height: 600px;
+    position: absolute;
+    top: 0;
+    left: 700px;
+}
+
+.btn {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 400px;
+    right: 300px;
+}
