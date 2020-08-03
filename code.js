@@ -10,11 +10,12 @@ function setTimeRules() {
     NEW_CAR_COMING_TIME = 200 / PXLS_MOVED_PER_SEC * 1000;
 }
 
-
 var score = document.getElementById('score');
 var level = document.getElementById('level');
+var best = document.getElementById('best');
 var moveBtn = document.getElementById('move-btn');
 var myCar = document.getElementById('my-car');
+
 function moveCar(carArray) {
     var car = carArray[0];
     myCar.classList.toggle("car-right");
@@ -60,21 +61,22 @@ function addDirectionClass(car) {
 var intervalArray = [];
 var carArray = [];
 
-var createCarInterval;
-createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
+var createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
 
-var speedupInterval = setInterval(function () {
-    PXLS_MOVED_EACH_FRAME += 0.25;
-    setTimeRules();
-    clearInterval(createCarInterval);
-    createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
-    level.innerText = 'level: ' + (parseInt(level.innerText.slice(7)) + 1);
-}, LVL_TIME)
+var speedUpInterval = setInterval(speedUpIntervalFunc, LVL_TIME);
 
 function createCarIntervalFunc() {
     carArray.push(createCar());
     /* notice how the parameters are passed to the setInterval() function */
     intervalArray.push(setInterval(moveCarAndCheckCrash, MOVING_CAR_INTERVAL, carArray[carArray.length - 1]));
+}
+
+function speedUpIntervalFunc() {
+    PXLS_MOVED_EACH_FRAME += 0.25;
+    setTimeRules();
+    clearInterval(createCarInterval);
+    createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
+    level.innerText = 'level: ' + (parseInt(level.innerText.slice(7)) + 1);
 }
 
 function moveCarAndCheckCrash(car) {
@@ -111,18 +113,56 @@ function removeCar(car) {
 }
 
 function crashed() {
+    /* displaying crashed! Div */
     var resultText = document.createElement('div');
     resultText.className = 'result';
+    resultText.innerText = 'crashed!';
+    document.body.appendChild(resultText);
+
+    /* displaying retry Div */
+    var retry = document.createElement('div');
+    retry.className = 'retry';
+    retry.innerText = 'retry';
+    retry.onclick = reset;
+    document.body.appendChild(retry);
+
+    /* setting best score */
+    if (parseInt(best.innerText.slice(6)) < parseInt(score.innerText.slice(7))) {
+        best.innerText = 'best: ' + parseInt(score.innerText.slice(7));
+    }
+    /* making cars in the background transparent */
     myCar.classList.add('transparent');
     for(var i = 0; i < carArray.length; i++) {
         carArray[i].classList.add('transparent');
     }
-    resultText.innerText = 'crashed!';
     moveBtn.disabled = true;
-    document.body.appendChild(resultText);
     for (var i = 0; i < intervalArray.length; i++) {
         clearInterval(intervalArray[i]);
     }
     clearInterval(createCarInterval);
-    clearInterval(speedupInterval);
+    clearInterval(speedUpInterval);
+}
+
+function reset () {
+    PXLS_MOVED_EACH_FRAME = 0.5;
+    setTimeRules();
+    level.innerText = 'level: 1';
+    /* delete cars */
+    while (carArray.length !== 0) {
+        removeCar(carArray[0]);
+    }
+    score.innerText = 'score: 0'; /* must be after removeCar() bec. it increases the score */
+    intervalArray = [];
+    createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
+    speedUpInterval = setInterval(speedUpIntervalFunc, LVL_TIME);
+    /* removing 'crashed!' sign from the screen */
+    document.body.removeChild(document.getElementsByClassName('result')[0]);
+    /* removing retry button from screen */
+    document.body.removeChild(document.getElementsByClassName('retry')[0]);
+    /* removing transparency from cars */
+    var transparentArray = document.getElementsByClassName('transparent');
+    for (var i = 0; i< transparentArray.length; i++) {
+        transparentArray[i].classList.remove('transparent');
+    }
+    moveBtn.disabled = false;
 }

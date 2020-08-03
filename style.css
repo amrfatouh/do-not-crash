@@ -63,11 +63,12 @@ body {
 
 .summary-during-game {
     width: 200px;
-    height: 250px;
+    height: 315px;
     background-color: #55D;
     color: #ffc;
     text-align: center;
     font-size: 25px;
+    font-family: Tahoma, Verdana, sans-serif;
     padding-top: 50px;
     margin: 10px;
     box-sizing: border-box;
@@ -80,4 +81,26 @@ body {
     margin: 7px;
     border: solid 3px #dd9;
     border-radius: 7px;
+}
+
+.retry {
+    width: 120px;
+    height: 70px;
+    background: rgb(6, 167, 6);
+    color: #ffc;
+    font-size: 30px;
+    font-family: Tahoma, Verdana, sans-serif;
+    text-align: center;
+    padding-top: 13px;
+    box-sizing: border-box;
+    border-radius: 7px;
+    box-shadow: 0 0 5px 3px rgba(5, 209, 22, 0.486);
+    position: absolute;
+    top: 75%;
+    left: 47%;
+    z-index: 1;
+}
+.retry:hover {
+    box-shadow: 0 0 12px 7px rgba(5, 209, 22, 0.486);
+    cursor: pointer;
 }
