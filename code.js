@@ -1,6 +1,7 @@
 var MOVING_CAR_INTERVAL = 5;
 var PXLS_MOVED_EACH_FRAME = 0.5;
-var LVL_TIME = 7000;
+var LVL_TIME = 8000;
+var MAX_LVL = 11;
 var INTERVALS_PER_SEC, PXLS_MOVED_PER_SEC, NEW_CAR_COMING_TIME;
 setTimeRules();
 
@@ -82,11 +83,16 @@ function createCarIntervalFunc() {
 }
 
 function speedUpIntervalFunc() {
+    var currentLevel = parseInt(level.innerText.slice(7));
     PXLS_MOVED_EACH_FRAME += 0.25;
     setTimeRules();
     clearInterval(createCarInterval);
     createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
-    level.innerText = 'level: ' + (parseInt(level.innerText.slice(7)) + 1);
+    level.innerText = 'level: ' + (++currentLevel);
+    if(currentLevel === MAX_LVL) {
+        clearInterval(speedUpInterval);
+        level.innerText = 'level: max';
+    }
 }
 
 function moveCarAndCheckCrash(car) {
