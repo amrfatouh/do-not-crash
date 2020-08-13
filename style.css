@@ -1,6 +1,7 @@
 body {
     position: relative;
     margin: 0;
+    background-color: #AAA;
 }
 
 .car {
@@ -9,12 +10,17 @@ body {
     position: absolute;
 }
 .my-car {
-    background-color: #555;
     top: 400px;
     left: 600px;
+    width:34px;
+    height: 75px;
+    background-image: url('assets/images/my-car.png');
 }
 .opposite-car {
-    background-color: #A33;
+    width:38px;
+    height: 75px;
+    background-image: url('assets/images/opposite-car.png');
+    transform: rotate(180deg);
 }
 .car-left {
     left: 600px;

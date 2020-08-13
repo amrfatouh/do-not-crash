@@ -3,12 +3,16 @@ var PXLS_MOVED_EACH_FRAME = 0.5;
 var LVL_TIME = 8000;
 var MAX_LVL = 11;
 var INTERVALS_PER_SEC, PXLS_MOVED_PER_SEC, NEW_CAR_COMING_TIME;
+
+const MY_CAR_STARTING_POSITION = 400;
+const CAR_HEIGHT = 75;
+
 setTimeRules();
 
 function setTimeRules() {
     INTERVALS_PER_SEC = 1000 / MOVING_CAR_INTERVAL;
     PXLS_MOVED_PER_SEC = INTERVALS_PER_SEC * PXLS_MOVED_EACH_FRAME;
-    NEW_CAR_COMING_TIME = 200 / PXLS_MOVED_PER_SEC * 1000;
+    NEW_CAR_COMING_TIME = (CAR_HEIGHT * 4 / PXLS_MOVED_PER_SEC) * 1000;
 }
 
 var score = document.getElementById('score');
@@ -40,7 +44,7 @@ function handleKeyDown() {
 
 function isCrashUponMove(car) {
     var carPosition = parseFloat(car.style.top);
-    if (carPosition >= 350 && carPosition < 450) {
+    if (carPosition >= MY_CAR_STARTING_POSITION - CAR_HEIGHT && carPosition < MY_CAR_STARTING_POSITION + CAR_HEIGHT) {
         return true;
     } else {
         return false;
@@ -105,12 +109,12 @@ function moveCarAndCheckCrash(car) {
     /* removing the car at the end of the road */
     if (parseFloat(car.style.top) >= 500) {
         removeCar(car);
-    }
+    }   
 }
 
 
 function checkCrashWhileStopping(car) {
-    if (parseFloat(car.style.top) >= 350 && parseFloat(car.style.top) < 450) {
+    if (parseFloat(car.style.top) >= MY_CAR_STARTING_POSITION - CAR_HEIGHT && parseFloat(car.style.top) < MY_CAR_STARTING_POSITION + CAR_HEIGHT) {
         if (car.classList.contains('car-left') && myCar.classList.contains('car-left')) {
             crashed();
         } else if (car.classList.contains('car-right') && myCar.classList.contains('car-right')) {
