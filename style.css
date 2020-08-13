@@ -4,6 +4,24 @@ body {
     background-color: #AAA;
 }
 
+.menu-item {
+    background-color: #EEE;
+    display: inline-block;
+    padding: 10px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    border: 1px solid #888;
+    z-index: 10;
+    position: fixed;
+}
+.menu-item:hover {
+    background-color: #CCC;
+    cursor: pointer;
+}
+.how-to-play {
+    position: fixed;
+    z-index: 10;
+}
+
 .car {
     width: 50px;
     height: 50px;
