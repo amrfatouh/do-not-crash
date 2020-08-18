@@ -91,14 +91,8 @@ body {
 .car-left {
     left: 555px;
 }
-.my-car-left {
-    animation: steerLeft .3s ease-in-out 1;
-}
 .car-right {
     left: 665px;
-}
-.my-car-right {
-    animation: steerRight .3s ease-in-out 1;
 }
 
 .btn {

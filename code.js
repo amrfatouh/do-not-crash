@@ -10,7 +10,6 @@ const CAR_HEIGHT = 75;
 var ROAD_REPITITION_ELEMENT = '-135px';
 
 var TREE_CREATION_TIME, PXLS_BETWEEN_EACH_TREE, PXLS_MOVED_EACH_FRAME_BY_TREE, NUM_OF_TREE_INTERVALS_FOR_CREATION;
-setTimeRules();
 
 function setTimeRules() {
     INTERVALS_PER_SEC = 1000 / MOVING_CAR_INTERVAL;
@@ -21,6 +20,9 @@ function setTimeRules() {
     PXLS_MOVED_EACH_FRAME_BY_TREE = PXLS_MOVED_EACH_FRAME / 2;
     NUM_OF_TREE_INTERVALS_FOR_CREATION = PXLS_BETWEEN_EACH_TREE / PXLS_MOVED_EACH_FRAME_BY_TREE;
     TREE_CREATION_TIME = NUM_OF_TREE_INTERVALS_FOR_CREATION * MOVING_CAR_INTERVAL;
+    /* setting animation speed */
+    currentLevel = parseInt(level.innerText.slice(7));
+    MY_CAR_ANIMATION = 0.3 - currentLevel * 0.015;
 
 }
 
@@ -31,16 +33,20 @@ var moveBtn = document.getElementById('move-btn');
 var myCar = document.getElementById('my-car');
 var road = document.querySelector('.road');
 
+var currentLevel = parseInt(level.innerText.slice(7));
+var MY_CAR_ANIMATION = 0.3 - currentLevel * 0.015;
+
+setTimeRules();
+
 function moveCar(carArray) {
     var car = carArray[0];
     myCar.classList.toggle("car-right");
     myCar.classList.toggle("car-left");
     if(myCar.classList.contains('car-left')) {
-        myCar.classList.remove('my-car-right');
-        myCar.classList.add('my-car-left');
+        myCar.style.animation = `steerLeft ${MY_CAR_ANIMATION}s ease-in-out 1`;
+
     } else {
-        myCar.classList.remove('my-car-left');
-        myCar.classList.add('my-car-right');
+        myCar.style.animation = `steerRight ${MY_CAR_ANIMATION}s ease-in-out 1`;
     }
 
     /* checking crashing upon moving the car */
@@ -111,7 +117,6 @@ function createCarIntervalFunc() {
 }
 
 function speedUpIntervalFunc() {
-    var currentLevel = parseInt(level.innerText.slice(7));
     PXLS_MOVED_EACH_FRAME += 0.25;
     setTimeRules();
     clearInterval(createCarInterval);
@@ -119,6 +124,7 @@ function speedUpIntervalFunc() {
     clearInterval(treeCreationInterval);
     treeCreationInterval = setInterval(treeCreationIntervalFunc, TREE_CREATION_TIME);
     level.innerText = 'level: ' + (++currentLevel);
+    myCar.style.transition = `all ${MY_CAR_ANIMATION}s ease-in-out`
     if (currentLevel === MAX_LVL) {
         clearInterval(speedUpInterval);
         level.innerText = 'level: max';
