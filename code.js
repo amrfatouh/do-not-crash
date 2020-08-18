@@ -7,12 +7,21 @@ var INTERVALS_PER_SEC, PXLS_MOVED_PER_SEC, NEW_CAR_COMING_TIME;
 const MY_CAR_STARTING_POSITION = 400;
 const CAR_HEIGHT = 75;
 
+var ROAD_REPITITION_ELEMENT = '-135px';
+
+var TREE_CREATION_TIME, PXLS_BETWEEN_EACH_TREE, PXLS_MOVED_EACH_FRAME_BY_TREE, NUM_OF_TREE_INTERVALS_FOR_CREATION;
 setTimeRules();
 
 function setTimeRules() {
     INTERVALS_PER_SEC = 1000 / MOVING_CAR_INTERVAL;
     PXLS_MOVED_PER_SEC = INTERVALS_PER_SEC * PXLS_MOVED_EACH_FRAME;
     NEW_CAR_COMING_TIME = (CAR_HEIGHT * 4 / PXLS_MOVED_PER_SEC) * 1000;
+
+    PXLS_BETWEEN_EACH_TREE = 200;
+    PXLS_MOVED_EACH_FRAME_BY_TREE = PXLS_MOVED_EACH_FRAME / 2;
+    NUM_OF_TREE_INTERVALS_FOR_CREATION = PXLS_BETWEEN_EACH_TREE / PXLS_MOVED_EACH_FRAME_BY_TREE;
+    TREE_CREATION_TIME = NUM_OF_TREE_INTERVALS_FOR_CREATION * MOVING_CAR_INTERVAL;
+
 }
 
 var score = document.getElementById('score');
@@ -20,11 +29,19 @@ var level = document.getElementById('level');
 var best = document.getElementById('best');
 var moveBtn = document.getElementById('move-btn');
 var myCar = document.getElementById('my-car');
+var road = document.querySelector('.road');
 
 function moveCar(carArray) {
     var car = carArray[0];
     myCar.classList.toggle("car-right");
     myCar.classList.toggle("car-left");
+    if(myCar.classList.contains('car-left')) {
+        myCar.classList.remove('my-car-right');
+        myCar.classList.add('my-car-left');
+    } else {
+        myCar.classList.remove('my-car-left');
+        myCar.classList.add('my-car-right');
+    }
 
     /* checking crashing upon moving the car */
     if (isCrashUponMove(car)) {
@@ -58,7 +75,7 @@ function createCar() {
     var car = document.createElement('div');
     car.classList.add('car', 'opposite-car');
     car = addDirectionClass(car);
-    car.style.top = '0';
+    car.style.top = -1 * CAR_HEIGHT + 'px';
     document.body.appendChild(car);
     return car;
 }
@@ -78,8 +95,12 @@ function addDirectionClass(car) {
 
 var intervalArray = [];
 var carArray = [];
-
 var createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
+
+var treeArray = [];
+var treeMovingIntervalArray = [];
+var treeCreationInterval = setInterval(treeCreationIntervalFunc, TREE_CREATION_TIME)
+
 
 var speedUpInterval = setInterval(speedUpIntervalFunc, LVL_TIME);
 
@@ -95,13 +116,14 @@ function speedUpIntervalFunc() {
     setTimeRules();
     clearInterval(createCarInterval);
     createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
+    clearInterval(treeCreationInterval);
+    treeCreationInterval = setInterval(treeCreationIntervalFunc, TREE_CREATION_TIME);
     level.innerText = 'level: ' + (++currentLevel);
     if (currentLevel === MAX_LVL) {
         clearInterval(speedUpInterval);
         level.innerText = 'level: max';
     }
 }
-
 function moveCarAndCheckCrash(car) {
     /* moving car */
     car.style.top = (parseFloat(car.style.top) + PXLS_MOVED_EACH_FRAME) + 'px';
@@ -110,12 +132,10 @@ function moveCarAndCheckCrash(car) {
     checkCrashWhileStopping(car);
 
     /* removing the car at the end of the road */
-    if (parseFloat(car.style.top) >= 500) {
+    if (parseFloat(car.style.top) >= window.innerHeight + CAR_HEIGHT) {
         removeCar(car);
     }
 }
-
-
 function checkCrashWhileStopping(car) {
     if (parseFloat(car.style.top) >= MY_CAR_STARTING_POSITION - CAR_HEIGHT && parseFloat(car.style.top) < MY_CAR_STARTING_POSITION + CAR_HEIGHT) {
         if (car.classList.contains('car-left') && myCar.classList.contains('car-left')) {
@@ -125,7 +145,6 @@ function checkCrashWhileStopping(car) {
         }
     }
 }
-
 function removeCar(car) {
     document.body.removeChild(car);
     clearInterval(intervalArray[0]);
@@ -133,6 +152,39 @@ function removeCar(car) {
     carArray.shift();
     /* adding score */
     score.innerText = 'score: ' + (parseInt(score.innerText.slice(7)) + 1);
+}
+
+/* trees intervals functions */
+function treeCreationIntervalFunc() {
+    var tree = document.createElement('div');
+    tree.className = 'tree';
+    tree.classList.add(((Math.ceil(Math.random() * 2)) === 1) ? 'tree-left' : 'tree-right')
+    tree.style.top = '-200';
+    document.body.appendChild(tree);
+    treeArray.push(tree)
+
+    treeMovingIntervalArray.push(setInterval(moveTree, MOVING_CAR_INTERVAL, tree))
+}
+function moveTree(tree) {
+    tree.style.top = (parseFloat(tree.style.top) + PXLS_MOVED_EACH_FRAME / 2) + 'px';
+    if (parseFloat(tree.style.top) + tree.offsetHeight > window.innerHeight + 200) {
+        removeTree(); 
+    }
+}
+function removeTree() {
+    clearInterval(treeMovingIntervalArray[0]);
+    treeMovingIntervalArray.shift();
+    document.body.removeChild(treeArray[0]);
+    treeArray.shift();
+}
+
+road.style.top = ROAD_REPITITION_ELEMENT;
+var roadInterval = setInterval(roadIntervalFunc, MOVING_CAR_INTERVAL);
+function roadIntervalFunc() {
+    road.style.top = (parseFloat(road.style.top) + PXLS_MOVED_EACH_FRAME / 2) + 'px';
+    if(parseFloat(road.style.top) >= 0 ) {
+        road.style.top = ROAD_REPITITION_ELEMENT;
+    }
 }
 
 function crashed() {
@@ -158,6 +210,10 @@ function crashed() {
     for (var i = 0; i < carArray.length; i++) {
         carArray[i].classList.add('transparent');
     }
+    road.classList.add('transparent');
+    document.querySelectorAll('.tree').forEach(tree => {
+        tree.classList.add('transparent');
+    })
     /* disabling inputs */
     moveBtn.disabled = true;
     document.body.onkeydown = reset;
@@ -167,6 +223,12 @@ function crashed() {
     }
     clearInterval(createCarInterval);
     clearInterval(speedUpInterval);
+    clearInterval(roadInterval);
+    clearInterval(treeCreationInterval);
+    treeMovingIntervalArray.forEach(interval => {
+        clearInterval(interval);
+    })
+    clearInterval(checkingInterval);
 }
 
 document.body.addEventListener('contextmenu', function (event) {
@@ -181,8 +243,6 @@ document.body.addEventListener('contextmenu', function (event) {
     menuItem.style.top = event.clientY + 'px';
     menuItem.style.left = event.clientX + 'px';
     document.body.appendChild(menuItem);
-    /* creating how to play */
-
     /* showing how to play */
     menuItem.addEventListener('click', function () {
         var howToPlay = document.createElement('div');
@@ -238,16 +298,25 @@ function reset() {
     while (carArray.length !== 0) {
         removeCar(carArray[0]);
     }
+    /* delete trees */
+    while (treeArray.length !== 0) {
+        removeTree(treeArray[0]);
+    }
     score.innerText = 'score: 0'; /* must be after removeCar() bec. it increases the score */
+    /* resetting interval-related variables */
     intervalArray = [];
+    treeMovingIntervalArray = [];
     createCarInterval = setInterval(createCarIntervalFunc, NEW_CAR_COMING_TIME);
     speedUpInterval = setInterval(speedUpIntervalFunc, LVL_TIME);
+    roadInterval = setInterval(roadIntervalFunc, MOVING_CAR_INTERVAL);
+    treeCreationInterval = setInterval(treeCreationIntervalFunc, TREE_CREATION_TIME)
+    checkingInterval = setInterval(checkingIntervalFunc, 1000);
     /* removing 'crashed!' sign from the screen */
     document.body.removeChild(document.getElementsByClassName('result')[0]);
     /* removing retry button from screen */
     document.body.removeChild(document.getElementsByClassName('retry')[0]);
     /* removing transparency from cars */
-    var transparentArray = document.getElementsByClassName('transparent');
+    var transparentArray = document.querySelectorAll('.transparent');
     for (var i = 0; i < transparentArray.length; i++) {
         transparentArray[i].classList.remove('transparent');
     }
@@ -257,4 +326,13 @@ function reset() {
     /* deleting any shown menus */
     deleteMenuItem();
     deleteHowToPlay();
+}
+
+/* check if the console is working (not enough screen space) */
+var checkingInterval = setInterval(checkingIntervalFunc, 1000);
+function checkingIntervalFunc() {
+    if (window.innerHeight < 400 ) {
+        crashed();
+        alert('not sufficient screen space!');
+    }
 }
